@@ -1,13 +1,14 @@
-import { showMessage } from "./app.mjs";
+import { newGame, showMessage } from "./app.mjs";
 
 class Game {
   constructor() {
-    this.board = this.createBoard();
     this.players = {
-      one: { name: "X", symbol: 'url("./x.png")' },
-      two: { name: "O", symbol: 'url("./o.png")' },
+      one: { name: "X", background: 'url("./x.png")' },
+      two: { name: "O", background: 'url("./o.png")' },
     };
     this.currentPlayer = this.players.one;
+    this.board = this.createBoard();
+    showMessage(`Click "Start Game" to play!`);
   }
   createBoard() {
     const board = [];
@@ -19,22 +20,20 @@ class Game {
     }
     return board;
   }
-  gameState() {
-    if (this.checkWin(this.board)) { // check win
-        showMessage(0, this);
-        console.log('WIN main detected');
+  gameState(row, col) {
+    if (this.checkWin(row, col)) {
+      for (const [key, value] of Object.entries(this.players)) {
+        if (value.name === this.board[row][col].value) {
+          showMessage(`Player ${key} wins!`);
+          newGame(this.board);
+        }
       }
-    //if statement checking if some but not all of the squares are filled
-    if (this.board.flat().some(square => square.value === undefined)) { //if conditions for next player turn
-      if (this.currentPlayer.name) {
-        showMessage(2, this);
-        console.log('NEXT PLAYER turn detected');
-      }
-    }
-    if ((this.board.flat().every(square => square.value !== undefined)) && // check tie
-    (this.board.flat().every(square => square.value))) {
-    showMessage(3, this);
-    console.log('TIE detected');
+      console.log("win")
+      return "won";
+    } else if (this.board.every((row) => row.every((cell) => cell.value))) {
+      showMessage(`It's a tie!`);
+    } else {
+      showMessage(`It's ${this.currentPlayer.name}'s turn!`);
     }
   }
   changePlayer() {
@@ -43,36 +42,32 @@ class Game {
   markSquare(row, col) {
     if (!this.board[row][col].value) {
       this.board[row][col].value = this.currentPlayer.name;
-      if (this.checkWin(this.board)) {
-        showMessage(0, this);
-        console.log('WIN detected');
-      }
       this.changePlayer();
-      this.gameState();
+      this.gameState(row, col);
      
     } else {
       console.log('Invalid move. Square already marked.');
     };
   };
-  checkWin(board) {
-    for (let i = 0; i < 3; i++) {
-      if (board[i].filter(row => row.value === this.currentPlayer.name).length === 3) {
-        console.log("WIN 1 detected");
-        return this.currentPlayer.name, board[i].filter(row => row.value === this.currentPlayer.name);
-      }
-      if (board[0][i].value === this.currentPlayer.name && board[1][i].value === this.currentPlayer.name && board[2][i].value === this.currentPlayer.name) {
-        console.log("WIN 2 detected");
-        return this.currentPlayer.name, board[i].filter(row => row.value === this.currentPlayer.name);
-      }
-      if (board[0][0].value === this.currentPlayer.name && board[1][1].value === this.currentPlayer.name && board[2][2].value === this.currentPlayer.name) {
-        console.log("WIN 3 detected");
-        return this.currentPlayer.name, board[i].filter(row => row.value === this.currentPlayer.name);
-      }
-      if (board[0][2].value === this.currentPlayer.name && board[1][1].value === this.currentPlayer.name && board[2][0].value === this.currentPlayer.name) {
-        console.log("WIN 4 detected");
-        return this.currentPlayer.name, board[i].filter(row => row.value === this.currentPlayer.name);
-      }
-    }
+  checkWin(row, col) {
+    let diagonal1 = [];
+    let diagonal2 = [];
+    let currentMark = this.board[row][col].value;
+    console.log(`Placed ${this.board[row][col].value} at ${row}${col}`);
+    this.board.map((row, index) => {
+      diagonal1.push(row[index].value);
+      diagonal2.push(row[2 - index].value);
+    });
+    if ((this.board[row].every((mark) => mark.value === currentMark)) || 
+    (this.board.every((row) => row[col].value === currentMark)) ||
+    (diagonal1.every((mark) => mark === currentMark)) ||
+    (diagonal2.every((mark) => mark === currentMark))) {
+      return this.board[row][col].value;
+    } 
   }
-};
+  endGame() {
+    
+  }
+}
+
 export { Game };
