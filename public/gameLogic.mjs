@@ -1,14 +1,8 @@
-import { newGame, showMessage } from "./app.mjs";
-
+import { ui } from "./app.mjs";
 class Game {
   constructor() {
-    this.players = {
-      one: { name: "X", background: 'url("./x.png")' },
-      two: { name: "O", background: 'url("./o.png")' },
-    };
+    this.players = { one: "X", two: "O" };  
     this.currentPlayer = this.players.one;
-    this.board = this.createBoard();
-    showMessage(`Click "Start Game" to play!`);
   }
   createBoard() {
     const board = [];
@@ -20,16 +14,27 @@ class Game {
     }
     return board;
   }
+  markSquare(ui, event, board) {
+    const row = event.target.id[0];
+    const col = event.target.id[1];
+    console.log("Before");
+    console.log(board[row][col]);
+    console.log(board[row][col].value);
+    if (board[row][col].value === undefined) {
+      board[row][col].value = this.currentPlayer;
+      ui.updateTable(event, board);
+    }
+    console.log("After");
+    console.log(board[row][col]);
+  }
   gameState(row, col) {
     if (this.checkWin(row, col)) {
       for (const [key, value] of Object.entries(this.players)) {
         if (value.name === this.board[row][col].value) {
           showMessage(`Player ${key} wins!`);
-          newGame(this.board);
         }
       }
-      console.log("win")
-      return "won";
+   
     } else if (this.board.every((row) => row.every((cell) => cell.value))) {
       showMessage(`It's a tie!`);
     } else {
@@ -39,16 +44,7 @@ class Game {
   changePlayer() {
     this.currentPlayer = this.currentPlayer === this.players.one ? this.players.two : this.players.one;
   }
-  markSquare(row, col) {
-    if (!this.board[row][col].value) {
-      this.board[row][col].value = this.currentPlayer.name;
-      this.changePlayer();
-      this.gameState(row, col);
-     
-    } else {
-      console.log('Invalid move. Square already marked.');
-    };
-  };
+ 
   checkWin(row, col) {
     let diagonal1 = [];
     let diagonal2 = [];
@@ -65,9 +61,6 @@ class Game {
       return this.board[row][col].value;
     } 
   }
-  endGame() {
-    
-  }
 }
 
-export { Game };
+export const game = new Game()
