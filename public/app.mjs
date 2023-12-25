@@ -31,19 +31,19 @@ class userInterface {
       console.log(this.table);  
       button.addEventListener('click', this.newGame.bind(this));
   }
-  newGame() { // goes to handleUserInput
-    console.log("new game button clicked");
+  newGame() { 
+    console.log("new game");
+    this.showMessage("Player X's turn");
+    this.clearTable();
     const button = document.querySelector('.button');
     const game = new Game();
     const board = game.createBoard();
     button.style.display = 'none';
     this.instances = this.handleUserInput.bind(this, game, board);
     this.table.addEventListener("click", this.instances);
-    
   }
-   handleUserInput(game, board, event) { // goes to gameLogic module (markSquare) 
-    game.markSquare(event, this, board); 
-    
+   handleUserInput(game, board, event) {
+    game.markSquare(event, this, board);
   }
   updateTable(event, board) {
     const backgroundImage = {
@@ -60,7 +60,6 @@ class userInterface {
     msgContainer.textContent = msg;
   }
   endGame(game, board) {
-    //remove event listener
     this.table.removeEventListener("click", this.instances);
     const button = document.querySelector('.button');
     button.style.display = 'block';

@@ -16,10 +16,13 @@ class Game {
     return board;
   }
   markSquare(event, ui, board) {
+    console.log("event", event);
     console.log(event.target)
+    console.log(event.target.id)
     const row = event.target.id[0];
     const col = event.target.id[1];
-
+   if (event.target.tagName === "TD") {
+    console.log("event.target is a td");
     if (board[row][col].value === undefined) {
       console.log("marked square", row, col);
       board[row][col].value = this.currentPlayer;
@@ -27,9 +30,12 @@ class Game {
       this.checkWinOrDraw(ui, event, board);  
     } else {
       console.log("square already marked");
-      ui.showMessage("Invalid move, please try again");
+      ui.showMessage(`Invalid move ${this.currentPlayer}, please try again`);
     }
-    
+  } else {
+    console.log("event.target is not a td");
+    ui.showMessage(`Invalid move ${this.currentPlayer}, please try again`);
+  }
   }
   checkWinOrDraw(ui, event, board) {
     let win = false;
@@ -56,13 +62,16 @@ class Game {
   } 
   gameState(ui, win, draw, board) {
     if (win) {
+      console.log("win");
       ui.showMessage(`Player ${this.currentPlayer} wins!`);
       ui.endGame(ui, board);
     } else if (draw) {
+      console.log("draw");
       ui.showMessage("Draw!");
       ui.endGame(ui, board);
     } else {
       this.changePlayer();
+      console.log("change player");
       ui.showMessage(`Player ${this.currentPlayer}'s turn`);
     }  
   }
