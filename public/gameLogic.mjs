@@ -1,8 +1,9 @@
-import { ui } from "./app.mjs";
+import { userInterface } from "./app.mjs";
 class Game {
   constructor() {
     this.players = { one: "X", two: "O" };  
     this.currentPlayer = this.players.one;
+    console.log(this.currentPlayer);
   }
   createBoard() {
     const board = [];
@@ -14,53 +15,59 @@ class Game {
     }
     return board;
   }
-  markSquare(ui, event, board) {
+  markSquare(event, ui, board) {
+    console.log(event.target)
     const row = event.target.id[0];
     const col = event.target.id[1];
-    console.log("Before");
-    console.log(board[row][col]);
-    console.log(board[row][col].value);
+
     if (board[row][col].value === undefined) {
+      console.log("marked square", row, col);
       board[row][col].value = this.currentPlayer;
       ui.updateTable(event, board);
-    }
-    console.log("After");
-    console.log(board[row][col]);
-  }
-  gameState(row, col) {
-    if (this.checkWin(row, col)) {
-      for (const [key, value] of Object.entries(this.players)) {
-        if (value.name === this.board[row][col].value) {
-          showMessage(`Player ${key} wins!`);
-        }
-      }
-   
-    } else if (this.board.every((row) => row.every((cell) => cell.value))) {
-      showMessage(`It's a tie!`);
+      this.checkWinOrDraw(ui, event, board);  
     } else {
-      showMessage(`It's ${this.currentPlayer.name}'s turn!`);
+      console.log("square already marked");
+      ui.showMessage("Invalid move, please try again");
     }
+    
+  }
+  checkWinOrDraw(ui, event, board) {
+    let win = false;
+    let draw = false;
+    let diagonal1 = [];
+    let diagonal2 = [];
+    const row = event.target.id[0];
+    const col = event.target.id[1];
+    let currentMark = board[row][col].value;
+    board.map((row, index) => {
+      diagonal1.push(row[index].value);
+      diagonal2.push(row[2 - index].value);
+    });
+    if ((board[row].every((mark) => mark.value === currentMark)) || 
+    (board.every((row) => row[col].value === currentMark)) ||
+    (diagonal1.every((mark) => mark === currentMark)) ||
+    (diagonal2.every((mark) => mark === currentMark))) {
+      win = true;
+    }
+    if (board.every((row) => row.every((mark) => mark.value !== undefined))) {
+      draw = true;
+    }
+    this.gameState(ui, win, draw, board);
+  } 
+  gameState(ui, win, draw, board) {
+    if (win) {
+      ui.showMessage(`Player ${this.currentPlayer} wins!`);
+      ui.endGame(ui, board);
+    } else if (draw) {
+      ui.showMessage("Draw!");
+      ui.endGame(ui, board);
+    } else {
+      this.changePlayer();
+      ui.showMessage(`Player ${this.currentPlayer}'s turn`);
+    }  
   }
   changePlayer() {
     this.currentPlayer = this.currentPlayer === this.players.one ? this.players.two : this.players.one;
   }
- 
-  checkWin(row, col) {
-    let diagonal1 = [];
-    let diagonal2 = [];
-    let currentMark = this.board[row][col].value;
-    console.log(`Placed ${this.board[row][col].value} at ${row}${col}`);
-    this.board.map((row, index) => {
-      diagonal1.push(row[index].value);
-      diagonal2.push(row[2 - index].value);
-    });
-    if ((this.board[row].every((mark) => mark.value === currentMark)) || 
-    (this.board.every((row) => row[col].value === currentMark)) ||
-    (diagonal1.every((mark) => mark === currentMark)) ||
-    (diagonal2.every((mark) => mark === currentMark))) {
-      return this.board[row][col].value;
-    } 
-  }
 }
-
-export const game = new Game()
+export { Game };
