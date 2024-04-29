@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+
+# Editor files
+.vscode/
+*.swp
+*.swo
+*.swn
+*.swm
+*.bak
+
+# Dependency directories
+jspm_packages/
+typings/
+
+# Distribution directory
+dist/
+
+# OS generated files
+.DS_Store
+Thumbs.db
